@@ -9,7 +9,7 @@ int get_line(char s[]){
     int num_of_char = 0;
     char c =getchar();
 
-    while(c != '\n' && num_of_char != LINE){
+    while(c != '\n' /*&& c != '\r'*/ && num_of_char != LINE){
         strncat(s,&c,1);
         num_of_char++;
         c =getchar();
@@ -20,8 +20,8 @@ int get_line(char s[]){
 int get_word(char w[]){
     int num_of_char = 0;
     char c =getchar();
-    
-    while(c != '\n' && c != '\t' && c != ' ' && num_of_char != WORD){ 
+
+    while(c != '\n' && c != '\t' && c != ' ' && c != '\r' && num_of_char != WORD){
         strncat(w,&c,1);
         num_of_char++;
         c =getchar();
@@ -30,39 +30,46 @@ int get_word(char w[]){
 }
 
 int substring( char * str1, char * str2){
-    if(strstr(str1, str2) != NULL){
+    char *s;
+    s = strstr(str1,str2);
+    if (s != NULL)
         return 1;
-    }
-    else{
+    else
         return 0;
-    }
 }
 
 int similar (char *s, char *t, int n){
     int len_s = strlen(s);
     int len_t = strlen(t);
-    int miss, i , j;
-    
+    int miss= 0;
+    int i= 0;
+    int j= 0;
+
+    int cmp = strcmp(s,t);
+    if (!cmp )
+    {
+        return 1;
+    }
+
     while(i<len_t && j<len_s){
         if(t[i] == s[j]){
             i++;
             j++;
         }
         else {
-            j++;
+            i++;
             miss++;
         }
     }
-    if(miss == n){
+    if(miss <= n && (len_t-len_s) == 1){
         return 1;
     }
-    else 
+    else
         return 0;
 }
 
 void print_lines(char * str){
     char c =getchar();
-    int n;
 
     while(c != EOF){
        char *line = (char*) calloc(LINE,sizeof(char));
@@ -72,20 +79,20 @@ void print_lines(char * str){
            return;
        }
         line[0] = c;
-        n = get_line(line);
+        get_line(line);
         if (substring(line, str))
         {
             printf("%s\n",line);
-        } 
+        }
         c =getchar();
         if (line != NULL){
-            free(line);  
-        }       
+            free(line);
+        }
     }
 }
 
 void print_similar_words(char * str){
-     char c =getchar();
+    char c =getchar();
     while (c != EOF)
     {
        char *temp = (char*) calloc(WORD,sizeof(char));
@@ -96,20 +103,26 @@ void print_similar_words(char * str){
        }
        temp[0]=c;
        get_word(temp);
-       if (similar(str,temp,1)==1 || similar(str,temp,0)==1)
+       if (similar(str,temp,1)==1)
        {
            printf("%s\n",temp);
        }
        if (temp != NULL){
-            free(temp);  
-        } 
-       c =getchar();
-    } 
+            free(temp);
+        }
+       c = getchar();
+    }
 }
 
 int main(){
-    char option[2] = {0};
-    char word[WORD] = {0};
+    char *option = (char*) calloc(2,sizeof(char));
+    char *word = (char*) calloc(WORD,sizeof(char));
+    
+    if (word == NULL || option == NULL)
+    {
+        printf("Error");
+        return -1;
+    }
 
     get_word(word);
     get_word(option);
@@ -119,10 +132,16 @@ int main(){
         case 'a':
             print_lines(word);
             break;
-        
+
         case 'b':
             print_similar_words(word);
             break;
     }
+    if (word != NULL && option != NULL)
+    {
+        free(word);
+        free(option);
+    }
+
     return 1;
 }
