@@ -121,7 +121,7 @@ int main(){
     if (word == NULL || option == NULL)
     {
         printf("Error");
-        return -1;
+        return 1;
     }
 
     get_word(word);
@@ -143,5 +143,5 @@ int main(){
         free(option);
     }
 
-    return 1;
+    return 0;
 }
